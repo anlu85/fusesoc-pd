@@ -1,0 +1,24 @@
+services:
+  app:
+    image: gitlab.qamcom.se:5050/fusesoc/fusesoc-pd/fusesoc-pd-server:${IMAGE_TAG}
+    ports:
+      - "8000:8000"
+    volumes:
+      - static_volume:/app/staticfiles
+    env_file:
+      - ./.env
+
+  caddy:
+    image: caddy:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy:/etc/caddy # Caddyfile must be located in ./caddy on server
+      - static_volume:/app/staticfiles
+    entrypoint: /bin/sh -c "caddy run --config /etc/caddy/Caddyfile"
+    depends_on:
+      - app
+
+volumes:
+  static_volume:
